@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  cgm-ack:
+    container_name: cgm-ack
+    build: .
+    image: jonheese/cgm-ack:latest
+    ports:
+      - "127.0.0.1:5003:5003"
+    restart: always
