@@ -10,8 +10,7 @@ COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN set -eux\
     && pip install -r /usr/src/app/requirements.txt \
     && rm -rf /root/.cache/pip
-COPY . /usr/src/app
-RUN rm -f /usr/src/app/config.json
+COPY cgm_ack.py /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV TZ=America/New_York
