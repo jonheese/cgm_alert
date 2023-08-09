@@ -1,4 +1,6 @@
 {
+    "NIGHTSCOUT_URL": "https://nightscout.url.domain/api/v1/entries?count=1",
+    "ACK_URL": "https://ack.url.domain/ack",
     "LOGLEVEL": "WARNING",
     "LOW_THRESHOLD": 80,
     "HIGH_THRESHOLD": 200,

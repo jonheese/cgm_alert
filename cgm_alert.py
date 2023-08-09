@@ -33,6 +33,8 @@ except:
     )
     sys.exit(0)
 
+NIGHTSCOUT_URL = config.get('NIGHTSCOUT_URL')
+ACK_URL = config.get('ACK_URL')
 LOGLEVEL = config.get('LOGLEVEL', 'WARNING')
 
 LOW_THRESHOLD = config.get('LOW_THRESHOLD', 80)
@@ -195,9 +197,11 @@ def alert(bg, status):
     message['Subject'] = text
     message['From'] = SENDER_EMAIL
     message['To'] = RECIPIENT_EMAIL
-    html = \
-        f'<html><body><a href=\'https://cgm.jonheese.com/ack/{alert_uuid}\'>' + \
-        f'{text}</a></body></html>'
+    if ACK_URL:
+        html = f'<html><body><a href=\'{ACK_URL}/{alert_uuid}\'>' + \
+               f'{text}</a></body></html>'
+    else:
+        html = text
 
     message.attach(MIMEText(text, 'plain'))
     message.attach(MIMEText(html, 'html'))
@@ -214,10 +218,10 @@ def alert(bg, status):
         )
 
 def get_cgm_data():
+    if not NIGHTSCOUT_URL:
+        raise AttributeError('NIGHTSCOUT_URL must be set.  Check your config.json')
     try:
-        data = requests.get(
-            'https://nightscout.jonheese.com/api/v1/entries?count=1'
-        ).text.split()
+        data = requests.get(NIGHTSCOUT_URL).text.split()
     except:
         log.error(f'Error getting BG: {traceback.format_exc()}')
 
