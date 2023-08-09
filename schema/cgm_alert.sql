@@ -47,4 +47,4 @@ CREATE VIEW `view_alert` AS
     `tbl_alert` `a` JOIN `tbl_status` `s`
     ON (`a`.`status_id` = `s`.`id`)
   )
-);
+  ORDER BY `a`.`id`;
