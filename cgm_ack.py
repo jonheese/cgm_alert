@@ -1,11 +1,28 @@
 #!/usr/bin/python3
 
+import json
 import mysql.connector
+import sys
 import uuid
 
-from config import DB_HOST, DB_NAME, DB_USER, DB_PASS, LOGLEVEL
 from flask import Flask
 from mysql.connector import Error
+
+try:
+    with open('config.json', 'r') as fp:
+        config = json.load(fp)
+except:
+    print(
+        'File config.json is missing. ' +
+        'Did you copy config-dist.json to config.json?'
+    )
+    sys.exit(0)
+
+LOGLEVEL = config.get('LOGLEVEL', 'WARN')
+DB_HOST = config.get('DB_HOST', 'localhost')
+DB_NAME = config.get('DB_NAME', 'cgm_alert')
+DB_USER = config.get('DB_USER', 'cgm_alert')
+DB_PASS = config.get('DB_PASS', '')
 
 app = Flask(__name__)
 mysql_params = {

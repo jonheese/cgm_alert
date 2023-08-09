@@ -11,7 +11,6 @@ import datetime
 import logging
 import json
 import mysql.connector
-import os
 import requests
 import smtplib
 import ssl
@@ -19,13 +18,35 @@ import sys
 import traceback
 import uuid
 
-from config import LOGLEVEL, LOW_THRESHOLD, HIGH_THRESHOLD, URGENT_LOW_THRESHOLD
-from config import UNACKED_DELAY, ACKED_DELAY, SENDER_EMAIL, RECIPIENT_EMAIL
-from config import SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
-from config import DB_HOST, DB_NAME, DB_USER, DB_PASS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from mysql.connector import Error
+
+
+with open('config.json', 'r') as fp:
+    config = json.load(fp)
+
+LOGLEVEL = config.get('LOGLEVEL', 'WARNING')
+
+LOW_THRESHOLD = config.get('LOW_THRESHOLD', 80)
+HIGH_THRESHOLD = config.get('HIGH_THRESHOLD', 200)
+URGENT_LOW_THRESHOLD = config.get('URGENT_LOW_THRESHOLD', 55)
+
+UNACKED_DELAY = config.get('UNACKED_DELAY', 300)
+ACKED_DELAY = config.get('ACKED_DELAY', 1800)
+
+SENDER_EMAIL = config.get('SENDER_EMAIL')
+RECIPIENT_EMAIL = config.get('RECIPIENT_EMAIL', SENDER_EMAIL)
+
+SMTP_HOST = config.get('SMTP_HOST', 'smtp.gmail.com')
+SMTP_PORT = config.get('SMTP_PORT', 587)
+SMTP_USER = config.get('SMTP_USER', SENDER_EMAIL)
+SMTP_PASS = config.get('SMTP_PASS', '')
+
+DB_HOST = config.get('DB_HOST', 'localhost')
+DB_NAME = config.get('DB_NAME', 'cgm_alert')
+DB_USER = config.get('DB_USER', 'cgm_alert')
+DB_PASS = config.get('DB_PASS', '')
 
 # statuses
 OK = 0
