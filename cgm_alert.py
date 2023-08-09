@@ -23,8 +23,15 @@ from email.mime.multipart import MIMEMultipart
 from mysql.connector import Error
 
 
-with open('config.json', 'r') as fp:
-    config = json.load(fp)
+try:
+    with open('config.json', 'r') as fp:
+        config = json.load(fp)
+except:
+    print(
+        'File config.json is missing. ' +
+        'Did you copy config-dist.json to config.json?'
+    )
+    sys.exit(0)
 
 LOGLEVEL = config.get('LOGLEVEL', 'WARNING')
 
