@@ -11,6 +11,7 @@ import datetime
 import logging
 import json
 import mysql.connector
+import os
 import requests
 import smtplib
 import ssl
@@ -23,8 +24,9 @@ from email.mime.multipart import MIMEMultipart
 from mysql.connector import Error
 
 
+__path__ = os.path.dirname(__file__)
 try:
-    with open('config.json', 'r') as fp:
+    with open(f'{__path__}/config.json', 'r') as fp:
         config = json.load(fp)
 except:
     print(
@@ -171,9 +173,8 @@ def okay_to_send(status):
                     return False
 
 
-def store_timestamp(status):
+def store_timestamp(status, alert_uuid):
     now = datetime.datetime.now().timestamp()
-    alert_uuid = uuid.uuid4()
     conn = init_db()
     if not conn:
         raise RuntimeError('Unable to connect to the database')
@@ -184,7 +185,6 @@ def store_timestamp(status):
     cursor.execute(query)
     conn.commit()
     cursor.close()
-    return alert_uuid
 
 
 def alert(bg, status):
@@ -192,7 +192,7 @@ def alert(bg, status):
         return
     text = f'{statuses[status]} - {bg}'
     log.info(text)
-    alert_uuid = store_timestamp(status)
+    alert_uuid = uuid.uuid4()
     message = MIMEMultipart('alternative')
     message['Subject'] = text
     message['From'] = SENDER_EMAIL
@@ -210,12 +210,14 @@ def alert(bg, status):
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.ehlo()
         server.starttls(context=context)
+        log.debug(f'Logging in to {SMTP_HOST} with user {SMTP_USER} and pass starting with {SMTP_PASS[:4]}')
         server.login(SMTP_USER, SMTP_PASS)
         server.sendmail(
             SENDER_EMAIL,
             RECIPIENT_EMAIL,
             message.as_string()
         )
+    store_timestamp(status, alert_uuid)
 
 def get_cgm_data():
     if not NIGHTSCOUT_URL:
